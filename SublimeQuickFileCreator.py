@@ -50,23 +50,15 @@ class QuickCreateFileCreatorBase(sublime_plugin.WindowCommand):
         self.relative_paths = []
         self.full_torelative_paths = {}
         for path in folders:
-            print('path', path)
             rootfolders = os.path.split(path)[-1]
             self.rel_path_start = os.path.split(path)[0]
-            print('rel start', os.path.split(path))
-            print('os split', self.rel_path_start)
             if not self.excluded.search(rootfolders):
-                print('adding root', rootfolders)
                 self.full_torelative_paths[rootfolders] = path
                 self.relative_paths.append(rootfolders)
 
 
             for base, dirs, files in os.walk(path):
-                # if '.git' not in base and 'node_modules' not in base:
-                #     print('walk', base)
                 for dir in dirs:
-                    if '.git' not in base and 'node_modules' not in base:
-                        print('dir', dir)
                     relative_path = os.path.relpath(os.path.join(base, dir), self.rel_path_start)
                     if not self.excluded.search(relative_path):
                         self.full_torelative_paths[relative_path] = os.path.join(base, dir)
@@ -76,7 +68,6 @@ class QuickCreateFileCreatorBase(sublime_plugin.WindowCommand):
         view = self.window.active_view()
         if view.file_name():
             cur_dir = os.path.relpath(os.path.dirname(view.file_name()), self.rel_path_start)
-            print('current', cur_dir, cur_dir in self.full_torelative_paths)
             if cur_dir in self.full_torelative_paths:
                 i = self.relative_paths.index(cur_dir)
                 self.relative_paths.insert(0, self.relative_paths.pop(i))
